@@ -3,12 +3,13 @@
 """
 Create a main network where contains 2 local controllers and 1 remote controllers.
 """
-
+import sys
 from mininet.net import Mininet
 from mininet.node import OVSSwitch, Controller, RemoteController
 from mininet.topolib import Topo
 from mininet.log import setLogLevel
 from mininet.cli import CLI
+from argparse import ArgumentParser
 
 class MultiSwitch( OVSSwitch ):
     '''
@@ -37,9 +38,18 @@ class myTopo(Topo):
         self.addLink(s1, s3)  
         self.addLink(s2, s3) 
 
+def define_and_get_arguments(args=sys.argv[1:]):
+	parser = ArgumentParser(description="Run mn test net.")
+	parser.add_argument('--nodes', default=2, type=int, 
+						help="Host node number for a sub-network.")
+	args = parser.parse_args()
+
+	return args
 
 if __name__ == '__main__':
     setLogLevel( 'info' )
+	## get arguments
+    args = define_and_get_arguments()
 
     '''
     Two local and one "external" controller (which is actually c0)
@@ -54,7 +64,7 @@ if __name__ == '__main__':
     cmap = { 's1': c0, 's2': c1, 's3': c2 }
 
     ## initialize topology templace
-    topo = myTopo(4)
+    topo = myTopo(args.nodes)
 
     ## new a mn instance
     net = Mininet( topo=topo, switch=MultiSwitch, build=False, waitConnected=True )
