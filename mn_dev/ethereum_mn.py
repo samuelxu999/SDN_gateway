@@ -5,10 +5,11 @@ Create a main network where contains 2 local controllers and 1 remote controller
 """
 import sys
 from mininet.net import Mininet
-from mininet.node import OVSSwitch, Controller, RemoteController
+from mininet.node import OVSSwitch, Controller, RemoteController, CPULimitedHost
 from mininet.topolib import Topo
 from mininet.log import setLogLevel, info
 from mininet.cli import CLI
+from mininet.util import custom
 from argparse import ArgumentParser
 
 class MultiSwitch( OVSSwitch ):
@@ -20,8 +21,9 @@ class MultiSwitch( OVSSwitch ):
 
 class myTopo(Topo):
     def build(self, count=1):
+        ## create custom host and add the network
         hosts = [ self.addHost( 'h%d' % i )                                                                                   
-                  for i in range( 1, 2*count + 1 ) ] 
+                  for i in range( 1, 2*count + 1 ) ]
 
         ## create s1 for left network
         s1 = self.addSwitch('s1')
@@ -39,16 +41,20 @@ class myTopo(Topo):
         self.addLink(s2, s3) 
 
 def define_and_get_arguments(args=sys.argv[1:]):
-	parser = ArgumentParser(description="Run mn test net.")
-	parser.add_argument('--nodes', default=2, type=int, 
-						help="Host node number for a sub-network.")
-	args = parser.parse_args()
+    parser = ArgumentParser(description="Run mn test net.")
 
-	return args
+    parser.add_argument('--nodes', default=2, type=int, 
+                        help="Host node number for a sub-network.")
+
+    parser.add_argument('--cpu', default=1.0, type=float, 
+                        help="Host node cup limitation.")
+
+    args = parser.parse_args(args=args)
+    return args
 
 if __name__ == '__main__':
     setLogLevel( 'info' )
-	## get arguments
+    ## get arguments
     args = define_and_get_arguments()
 
     '''
@@ -67,7 +73,9 @@ if __name__ == '__main__':
     topo = myTopo(args.nodes)
 
     ## new a mn instance
-    net = Mininet( topo=topo, switch=MultiSwitch, build=False, waitConnected=True )
+    host = custom( CPULimitedHost, sched='cfs', cpu=args.cpu )
+    net = Mininet( topo=topo, host=host, switch=MultiSwitch, build=False, waitConnected=True )
+    # net = Mininet( topo=topo, switch=MultiSwitch, build=False, waitConnected=True )
 
     ## add controllers
     for c in [ c0, c1 ]:
