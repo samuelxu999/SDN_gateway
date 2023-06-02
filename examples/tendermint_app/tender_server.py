@@ -1,13 +1,21 @@
-import time
+'''
+========================
+tendermint server module
+========================
+Created on June.2, 2023
+@author: Xu Ronghua
+@Email:  rxu22@binghamton.edu
+@TaskDescription: This module provide encapsulation of server API that interact with local tendermint node.
+'''
+
 import sys
 import json
-import logging
 from argparse import ArgumentParser
 
 from flask import Flask, jsonify
 from flask import abort,make_response,request
 
-from utilities import TypesUtil,FileUtil
+from utilities import TypesUtil
 from RPC_Client import PRC_Client
 
 app = Flask(__name__)

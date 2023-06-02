@@ -16,7 +16,50 @@ import pickle
 import glob, os, fnmatch
 import codecs
 
+'''
+DatetimeUtil class for format handle between datatime and string
+'''
+class DatetimeUtil(object):
+	#switch int timestamp to datatime object
+	@staticmethod
+	def timestamp_datetime(_timestamp):
+		obj_datetime=datetime.fromtimestamp(_timestamp/1e3)
+		return obj_datetime
 
+	#switch datatime object to int timestamp
+	@staticmethod
+	def datetime_timestamp(_datetime):
+		int_datetime=int(_datetime.timestamp() * 1e3)
+		return int_datetime
+
+	#switch datatime object to format string
+	@staticmethod
+	def datetime_string(_datetime, _format="%Y-%m-%d %H:%M:%S"):
+		str_datetime=_datetime.strftime(_format)
+		return str_datetime
+		
+	#switch format string to datatime object
+	@staticmethod
+	def string_datetime(_strtime, _format="%Y-%m-%d %H:%M:%S"):
+		_datetime=datetime.strptime(_strtime, _format)
+		return _datetime
+		
+	#get datatime duration from format input
+	@staticmethod
+	def datetime_duration(_weeks=0,_days=0,_hours=0,_minutes=0):
+		_duration=timedelta(weeks=_weeks,days=_days,hours=_hours,minutes=_minutes)
+		return _duration
+		
+	#check whether input datatime has expired
+	@staticmethod
+	def IsExpired(str_datatime):
+		time1=DatetimeUtil.string_datetime(str_datatime)
+		time2=datetime.now()
+		diff = (time1-time2).total_seconds()
+		if(diff>0):
+			return False
+		else:
+			return True
 		
 '''
 TypesUtil class for data type format transfer
@@ -107,18 +150,18 @@ class TypesUtil(object):
 	# get hashed json data
 	@staticmethod
 	def hash_json(json_block, hash_type='sha256'):
-	    """
-	    Create a SHA-256 hash of a json block
-	    """
-	    # We must make sure that the Dictionary is Ordered, or we'll have inconsistent hashes
-	    block_string = json.dumps(json_block, sort_keys=True).encode()
-	    
-	    if(hash_type=='sha1'):
-	    	return hashlib.sha1(block_string).hexdigest()
-	    elif(hash_type=='sha256'):
-	    	return hashlib.sha256(block_string).hexdigest()
-	    else:
-	    	return None
+		"""
+		Create a SHA-256 hash of a json block
+		"""
+		# We must make sure that the Dictionary is Ordered, or we'll have inconsistent hashes
+		block_string = json.dumps(json_block, sort_keys=True).encode()
+
+		if(hash_type=='sha1'):
+			return hashlib.sha1(block_string).hexdigest()
+		elif(hash_type=='sha256'):
+			return hashlib.sha256(block_string).hexdigest()
+		else:
+			return None
 
 '''
 FileUtil class for handling file data

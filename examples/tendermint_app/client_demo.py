@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 '''
 ========================
 client_demo module
@@ -10,11 +8,12 @@ Created on June.2, 2023
 @TaskDescription: This module provide encapsulation of client API that access to Web service.
 '''
 import sys
-import requests
-import json
+import datetime
+import time
 import argparse
 
-from service_api import SrvAPI, ReqThread, QueryThread
+from service_api import SrvAPI
+from utilities import FileUtil, DatetimeUtil
 
 class WSClient(object):
     
@@ -67,11 +66,20 @@ if __name__ == "__main__":
         token_json['ac']['resource'] = "/test/api/v1.0/dt"
         token_json['ac']['action'] = "GET"
         token_json['ac']['conditions'] = "MWF, start:8:12:32 and end:14:32:32"
+        token_json['ac']['timestamp'] = DatetimeUtil.datetime_timestamp(datetime.datetime.now())
      
         tx_json = {}
         tx_json['key']= key_id
         tx_json['value']=token_json
 
+        start_time=time.time()
         print(WSClient.Set_DataByID(target_address, tx_json))
+        exec_time=time.time()-start_time
+        print(format(exec_time*1000, '.3f'))
+        FileUtil.save_testlog('test_results', 'set_Token.log', format(exec_time*1000, '.3f'))
     else:
+        start_time=time.time()
         print(WSClient.Get_DataByID(target_address, key_id))
+        exec_time=time.time()-start_time
+        print(format(exec_time*1000, '.3f'))
+        FileUtil.save_testlog('test_results', 'get_Token.log', format(exec_time*1000, '.3f'))
