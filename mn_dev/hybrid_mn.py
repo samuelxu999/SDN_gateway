@@ -117,13 +117,15 @@ if __name__ == '__main__':
                 export PATH=$PATH:$LD_LIBRARY_PATH; \
                 cd ../Tendermint/MyChain; \
                 cp genesis.json node"+str(node_id)+"/config/; \
-                ./kvstore_run.sh node"+str(node_id)+" kvstore &>/dev/null &"
+                ./kvstore_run.sh node"+str(node_id)+" kvstore &>/dev/null & \
+                cd ../../examples/tendermint_app; \
+                python3.8 tender_server.py --debug --threaded -p 8088 &>/dev/null &"
         host.cmd(tender_cmd)
     info( "\n*** Hosts are running tendermint node.\n" )
     for host in net.hosts[args.nodes:]:
         info(host.name, host.IP(), host.cmd('ps -aux | grep tendermint'), "\n")
         break;
-    
+    #  python3.8 tender_server.py --debug --threaded -p 8088
     ## ----------- launch net CLI -------------
     CLI( net )
 
@@ -139,6 +141,8 @@ if __name__ == '__main__':
     for host in net.hosts[args.nodes:]:
         tender_cmd = "./kvstore_run.sh"
         host.cmd('kill %' + tender_cmd)
+        tender_server = 'tender_server.py'
+        host.cmd('kill %' + tender_server)
     
     ## stop net
     net.stop()
