@@ -8,6 +8,7 @@ Created on June.2, 2023
 @TaskDescription: This module provide encapsulation of client API that access to Web service.
 '''
 import sys
+import os
 import datetime
 import time
 import argparse
@@ -15,7 +16,7 @@ import random
 import threading
 
 from service_api import SrvAPI
-from utilities import FileUtil, DatetimeUtil
+from utilities import FileUtil, DatetimeUtil, TypesUtil
 
 class ReqThread (threading.Thread):
 	'''
@@ -93,6 +94,7 @@ def demo_commit(args):
     token_json['ac']['action'] = "GET"
     token_json['ac']['conditions'] = "MWF, start:8:12:32 and end:14:32:32"
     token_json['ac']['timestamp'] = DatetimeUtil.datetime_timestamp(datetime.datetime.now())
+    token_json['ac']['nonce'] = TypesUtil.string_to_hex(os.urandom(6))
 
     tx_json = {}
     tx_json['key']= key_id
@@ -150,6 +152,7 @@ def thread_commit(args):
         token_json['ac']['action'] = "GET"
         token_json['ac']['conditions'] = "MWF, start:8:12:32 and end:14:32:32"
         token_json['ac']['timestamp'] = DatetimeUtil.datetime_timestamp(datetime.datetime.now())
+        token_json['ac']['nonce'] = TypesUtil.string_to_hex(os.urandom(6))
 
         tx_json = {}
         tx_json['key']= key_id + str(i)
